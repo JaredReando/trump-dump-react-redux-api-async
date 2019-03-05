@@ -7,82 +7,76 @@ class SMSForm extends Component {
       message: {
         to: '',
         body: ''
-      },
-      submitting: false,
-      error: false
+      }
     };
     this._phone = React.createRef();
-    this._message = React.createRef();
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.clearFormValues = this.clearFormValues.bind(this);
+  }
+
+  componentDidMount() {
+    const axios = require('axios');
+
+    axios.get('https://api.tronalddump.io/random/quote')
+      .then(response => {
+        this.setState({trumpQuote: response.data.value});
+      });
+
   }
 
   handleSubmit() {
     let newState = {
       message: {
         to: this._phone.current.value,
-        body: this._message.current.value
+        body: this.state.trumpQuote
       },
       submitting: true,
       error: false
-    }
-    this.setState(newState)
-    this.clearFormValues();
+    };
+    this.setState(newState);
+    let messageNow = {
+      to: this._phone.current.value,
+      body: this.state.trumpQuote
+    };
 
     fetch('http://localhost:3001/api/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(this.state.message)
-    })
-      .then(res => res.json())
-      .then(data => {
-        if(data.success) {
-          this.setState({
-            error: false,
-            submitting: false
-          });
-        } else {
-          this.setState({
-            error: true,
-            submitting: false
-          })
-        }
-      })
+      body: JSON.stringify(messageNow)
+    });
+
   }
 
-clearFormValues() {
-  this._phone.current.value = '';
-  this._message.current.value = '';
-}
+  clearFormValues() {
+    this._phone.current.value = '';
+
+  }
 
 
-render() {
-    console.log('canDoesWork?', JSON.stringify(this.state.message))
-  return(
-    <div style={{display: 'grid', jusifyItems: 'center', alignItems: 'center', gridTemplateColumns: '1fr', outline: '1px solid black'}}>
-      <h1 style={{textAlign: 'center'}}>SMSForm Works!</h1>
+  render() {
+
+    return(
+      <div style={{display: 'grid', jusifyItems: 'center', alignItems: 'center', gridTemplateColumns: '1fr', outline: '1px solid black'}}>
+        <h1 style={{textAlign: 'center'}}>SMSForm Works!</h1>
         <input
           type='number'
           placeholder={this.state.message.to}
           ref={this._phone}
         ></input>
-      <textarea
-          rows='5'
-          cols='50'
-          placeholder='send a tasty tweet to a friend.'
-          ref={this._message}
-        ></textarea>
-      <button style={{background: 'lightgreen'}} onClick={this.handleSubmit}>Submit</button>
 
-      <div style={{display: 'grid', gridTemplateColumns: '1fr 3fr'}}>
-        <h3>To: {this.state.message.to}</h3>
-        <h3>Message: {this.state.message.body}</h3>
+
+        <button style={{background: 'lightgreen'}} onClick={this.handleSubmit}>Submit</button>
+
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 3fr'}}>
+          <h3>To: {this.state.message.to}</h3>
+          <h3>Message: {this.state.message.body}</h3>
+        </div>
       </div>
-    </div>
-  )
-}
+    );
+  }
 
 
 }
