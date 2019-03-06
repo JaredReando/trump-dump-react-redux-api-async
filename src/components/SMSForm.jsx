@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 class SMSForm extends Component {
   constructor(props) {
@@ -13,6 +15,8 @@ class SMSForm extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.clearFormValues = this.clearFormValues.bind(this);
+
+    console.log(props); //eslint-disable-line no-console
   }
 
   componentDidMount() {
@@ -26,6 +30,10 @@ class SMSForm extends Component {
   }
 
   handleSubmit() {
+
+    this.props.dispatch({type: 'GET_DUMP', to: this._phone.current.value});
+
+
     let newState = {
       message: {
         to: this._phone.current.value,
@@ -81,4 +89,15 @@ class SMSForm extends Component {
 
 }
 
-export default SMSForm;
+
+SMSForm.propTypes={
+  dispatch: PropTypes.func.isRequired
+};
+
+const mapStateToProps = state => {
+
+  return {messages: state.messages};
+};
+
+
+export default connect(mapStateToProps)(SMSForm);
